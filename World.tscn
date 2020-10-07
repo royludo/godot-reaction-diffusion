@@ -1,0 +1,495 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://World.gd" type="Script" id=1]
+[ext_resource path="res://start1000x500.png" type="Texture" id=2]
+[ext_resource path="res://sim.shader" type="Shader" id=3]
+[ext_resource path="res://Camera2D.tscn" type="PackedScene" id=4]
+[ext_resource path="res://render.shader" type="Shader" id=5]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 3 )
+shader_param/DA = null
+shader_param/f = null
+shader_param/DB = null
+shader_param/k = null
+shader_param/pause_shader = false
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = ExtResource( 5 )
+shader_param/color_scale = null
+shader_param/exaggerate_colors = null
+shader_param/display_BorA = null
+
+[sub_resource type="ViewportTexture" id=3]
+viewport_path = NodePath("Viewport2")
+
+[sub_resource type="InputEventAction" id=4]
+action = "play"
+
+[sub_resource type="ShortCut" id=5]
+shortcut = SubResource( 4 )
+
+[sub_resource type="InputEventAction" id=6]
+action = "forward"
+
+[sub_resource type="ShortCut" id=7]
+shortcut = SubResource( 6 )
+
+[node name="World" type="Node2D"]
+script = ExtResource( 1 )
+DA = 1.0
+f = 0.055
+DB = 0.2
+k = 0.062
+fps_limit = 200
+exaggerate_colors = true
+display_BorA = true
+paint_BorA = true
+
+[node name="Camera2D" parent="." instance=ExtResource( 4 )]
+limit_left = 0
+limit_top = 0
+limit_right = 1000
+limit_bottom = 600
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 1000, 500 )
+hdr = false
+disable_3d = true
+usage = 0
+render_target_v_flip = true
+render_target_update_mode = 3
+
+[node name="BufferTexture" type="TextureRect" parent="Viewport"]
+material = SubResource( 1 )
+margin_right = 1000.0
+margin_bottom = 500.0
+texture = ExtResource( 2 )
+stretch_mode = 3
+
+[node name="Viewport2" type="Viewport" parent="."]
+size = Vector2( 1000, 500 )
+hdr = false
+disable_3d = true
+usage = 0
+render_target_v_flip = true
+render_target_update_mode = 3
+
+[node name="TextureRect" type="TextureRect" parent="Viewport2"]
+margin_right = 1000.0
+margin_bottom = 500.0
+texture = ExtResource( 2 )
+stretch_mode = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="finalDisplay" type="TextureRect" parent="."]
+material = SubResource( 2 )
+margin_top = 100.0
+margin_right = 1000.0
+margin_bottom = 600.0
+mouse_default_cursor_shape = 6
+texture = SubResource( 3 )
+stretch_mode = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="UILayer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 1000, 100 )
+color = Color( 0.176471, 0.160784, 0.156863, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HelpPopup" type="PopupPanel" parent="UILayer/ColorRect"]
+margin_left = 302.059
+margin_top = 181.949
+margin_right = 437.059
+margin_bottom = 277.949
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="UILayer/ColorRect/HelpPopup"]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 131.0
+margin_bottom = 92.0
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UILayer/ColorRect/HelpPopup/MarginContainer"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 117.0
+margin_bottom = 78.0
+focus_mode = 2
+text = "
+This is a Gray-Scott reaction-diffusion simulation using shaders. The purpose was to try GPU computing with Godot.
+
+More info on reaction-diffusion, the equations used and the meaning of the parameters here: https://www.karlsims.com/rd.html
+
+Controls:
+	Click to draw a reactant at max concentration (alternate which one with the \"Painting A/B\" button)
+	Mouse wheel to zoom
+	Middle click to pan
+	Space to Play/Pause the simulation
+	Arrow right to play only while it is hold
+	
+Change FPS limit to increase or decrease the speed of the simulation. 0 will remove limits and your GPU will run it as fast as possible.
+Be warned that the GPU will keep running even when the simulation is paused.
+The brightest color represents the highest concentration of reactant. 
+
+Bugs:
+	Drawing doesn't work immediately on reset, you need to let it run just a few frames.
+	Resizing the window will mess up the GUI. "
+selection_enabled = true
+
+[node name="HelpButton" type="Button" parent="UILayer/ColorRect"]
+margin_left = 970.0
+margin_top = 10.0
+margin_right = 990.0
+margin_bottom = 30.0
+shortcut_in_tooltip = false
+text = "?"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="UILayer/ColorRect"]
+margin_right = 965.0
+margin_bottom = 105.0
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UILayer/ColorRect/MarginContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 945.0
+margin_bottom = 85.0
+custom_constants/separation = 20
+alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer"]
+margin_top = 8.0
+margin_right = 140.0
+margin_bottom = 57.0
+size_flags_vertical = 4
+custom_constants/vseparation = 5
+custom_constants/hseparation = 10
+columns = 2
+
+[node name="LabelFPS" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer"]
+margin_right = 56.0
+margin_bottom = 24.0
+hint_tooltip = "0 for no limit"
+mouse_filter = 1
+size_flags_vertical = 1
+text = "FPS limit"
+align = 2
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FPSControl" type="SpinBox" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer"]
+margin_left = 66.0
+margin_right = 140.0
+margin_bottom = 24.0
+max_value = 10000.0
+rounded = true
+allow_greater = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TrueFPSLabel" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer"]
+margin_top = 32.0
+margin_right = 56.0
+margin_bottom = 46.0
+text = "FPS"
+align = 2
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TrueFPS" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer"]
+margin_left = 66.0
+margin_top = 29.0
+margin_right = 140.0
+margin_bottom = 49.0
+rect_min_size = Vector2( 0, 20 )
+text = "start"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GridContainer2" type="GridContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer"]
+margin_left = 160.0
+margin_top = 6.0
+margin_right = 263.0
+margin_bottom = 59.0
+size_flags_vertical = 4
+custom_constants/vseparation = 5
+custom_constants/hseparation = 10
+columns = 2
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="DALabel" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer2"]
+margin_top = 5.0
+margin_right = 19.0
+margin_bottom = 19.0
+text = "DA"
+align = 2
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DAControl" type="SpinBox" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer2"]
+margin_left = 29.0
+margin_right = 103.0
+margin_bottom = 24.0
+min_value = -100.0
+step = 0.001
+value = 1.0
+allow_greater = true
+allow_lesser = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FLabel" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer2"]
+margin_top = 34.0
+margin_right = 19.0
+margin_bottom = 48.0
+text = "f"
+align = 2
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FControl" type="SpinBox" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer2"]
+margin_left = 29.0
+margin_top = 29.0
+margin_right = 103.0
+margin_bottom = 53.0
+min_value = -100.0
+step = 0.001
+value = 0.055
+allow_greater = true
+allow_lesser = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GridContainer3" type="GridContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer"]
+margin_left = 283.0
+margin_top = 6.0
+margin_right = 386.0
+margin_bottom = 59.0
+size_flags_vertical = 4
+custom_constants/vseparation = 5
+custom_constants/hseparation = 10
+columns = 2
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="DBLabel" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer3"]
+margin_top = 5.0
+margin_right = 19.0
+margin_bottom = 19.0
+text = "DB"
+align = 2
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DBControl" type="SpinBox" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer3"]
+margin_left = 29.0
+margin_right = 103.0
+margin_bottom = 24.0
+min_value = -100.0
+step = 0.001
+value = 0.18
+allow_greater = true
+allow_lesser = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="KLabel" type="Label" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer3"]
+margin_top = 34.0
+margin_right = 19.0
+margin_bottom = 48.0
+text = "k"
+align = 2
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="KControl" type="SpinBox" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer3"]
+margin_left = 29.0
+margin_top = 29.0
+margin_right = 103.0
+margin_bottom = 53.0
+min_value = -100.0
+step = 0.001
+value = 0.062
+allow_greater = true
+allow_lesser = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer"]
+margin_left = 449.0
+margin_right = 552.0
+margin_bottom = 65.0
+size_flags_horizontal = 6
+custom_constants/separation = 5
+
+[node name="ResetButton" type="Button" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer"]
+margin_right = 103.0
+margin_bottom = 30.0
+size_flags_vertical = 3
+shortcut_in_tooltip = false
+text = "Reset"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer"]
+margin_top = 35.0
+margin_right = 103.0
+margin_bottom = 65.0
+size_flags_vertical = 3
+custom_constants/separation = 5
+
+[node name="Play" type="Button" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_right = 70.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 70, 0 )
+hint_tooltip = "Space"
+toggle_mode = true
+shortcut_in_tooltip = false
+shortcut = SubResource( 5 )
+text = "Play"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Forward" type="Button" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 75.0
+margin_right = 103.0
+margin_bottom = 30.0
+hint_tooltip = "Right arrow"
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 7 )
+text = ">>"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer"]
+margin_left = 616.0
+margin_right = 807.0
+margin_bottom = 65.0
+custom_constants/separation = 5
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="ExaggerateSwitch" type="CheckButton" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2"]
+margin_right = 191.0
+margin_bottom = 40.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+pressed = true
+text = "Exaggerate colors"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2"]
+margin_left = 9.0
+margin_top = 45.0
+margin_right = 181.0
+margin_bottom = 65.0
+size_flags_horizontal = 4
+custom_constants/separation = 5
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="AorBSwitch" type="Button" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+margin_right = 91.0
+margin_bottom = 20.0
+toggle_mode = true
+pressed = true
+text = "Displaying B"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AorBPaintSwitch" type="Button" parent="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+margin_left = 96.0
+margin_right = 172.0
+margin_bottom = 20.0
+toggle_mode = true
+pressed = true
+text = "Painting B"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorScaleButton" type="OptionButton" parent="UILayer/ColorRect/MarginContainer/HBoxContainer"]
+margin_left = 827.0
+margin_top = 22.0
+margin_right = 925.0
+margin_bottom = 42.0
+size_flags_vertical = 4
+text = "color scale"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="UILayer/ColorRect/HelpButton" to="." method="_on_HelpButton_pressed"]
+[connection signal="value_changed" from="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer/FPSControl" to="." method="_on_FPSControl_value_changed"]
+[connection signal="value_changed" from="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer2/DAControl" to="." method="_on_DAControl_value_changed"]
+[connection signal="value_changed" from="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer2/FControl" to="." method="_on_FControl_value_changed"]
+[connection signal="value_changed" from="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer3/DBControl" to="." method="_on_DBControl_value_changed"]
+[connection signal="value_changed" from="UILayer/ColorRect/MarginContainer/HBoxContainer/GridContainer3/KControl" to="." method="_on_KControl_value_changed"]
+[connection signal="pressed" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer/ResetButton" to="." method="_on_ResetButton_pressed"]
+[connection signal="toggled" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/Play" to="." method="_on_Play_toggled"]
+[connection signal="button_down" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/Forward" to="." method="_on_Forward_button_down"]
+[connection signal="button_up" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/Forward" to="." method="_on_Forward_button_up"]
+[connection signal="toggled" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2/ExaggerateSwitch" to="." method="_on_ExaggerateSwitch_toggled"]
+[connection signal="toggled" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer/AorBSwitch" to="." method="_on_AorBSwitch_toggled"]
+[connection signal="toggled" from="UILayer/ColorRect/MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer/AorBPaintSwitch" to="." method="_on_AorBPaintSwitch_toggled"]
+[connection signal="item_selected" from="UILayer/ColorRect/MarginContainer/HBoxContainer/ColorScaleButton" to="." method="_on_ColorScaleButton_item_selected"]
